@@ -2,7 +2,8 @@
 
 from ulam import *
 
-ulam = UlamSpiral(3,0,0)
+# size, spin, start, incrementNumber
+ulam = UlamSpiral(13,7,1,2)
 ulam.fillGrid()
 
 
