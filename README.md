@@ -17,7 +17,7 @@ You can create an Ulam spiral object with the constructor:
   - 7 = right down
 
 + `start` is the integer > 0 in the center point
-+ `incrementNumber` is an integer > 0 which describes the amount added to the current after every step
++ `incrementNumber` is an integer > 0 which describes the amount added to the current number after every step
 
 ## Example
 
