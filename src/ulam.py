@@ -1,8 +1,10 @@
 #ulam.py
 
 import numpy
+import png
 
 EMPTY_REMARK=-1
+FILENAME="ulam"
 
 '''
 UlamSpiral represents a Ulam spiral as a numpy 2D array with a given size, start number, spin and increment
@@ -79,48 +81,6 @@ class UlamSpiral:
                 if self.grid[x,y]==EMPTY_REMARK:
                     return False
         return True
-    
-    def isCorner(self, x, y):
-        neighbours = 0
-
-        #lower neighbour
-        if not x+1>=self.size and self.grid[x+1,y] != EMPTY_REMARK:    
-            neighbours += 1
-
-        #right neighbor
-        if not y+1>=self.size and self.grid[x,y+1] != EMPTY_REMARK:    
-            neighbours += 1
-
-        #upper neighbour
-        if not x-1<0 and self.grid[x-1,y] != EMPTY_REMARK:    
-            neighbours += 1
-
-        #left neighbour
-        if not y-1<0 and self.grid[x,y-1] != EMPTY_REMARK:    
-            neighbours += 1
-
-        #lower right neighbour
-        if not x+1>=self.size and not y+1>=self.size and self.grid[x+1,y+1] != EMPTY_REMARK:    
-            neighbours += 1
-
-        #upper left neighbour
-        if not x-1<0 and not y-1<0 and self.grid[x-1,y-1] != EMPTY_REMARK:    
-            neighbours += 1
-
-        #lower left neighbour
-        if not x+1>=self.size and not y-1<0 and self.grid[x+1,y-1] != EMPTY_REMARK:    
-            neighbours += 1
-
-        #upper right neighbour
-        if not x-1<0 and not y+1>=self.size and self.grid[x-1,y+1] != EMPTY_REMARK:    
-            neighbours += 1
-
-        print("isCorner(): neighbours=" + str(neighbours))
-
-        #only a single neighbour is set -> corner! 
-        if neighbours<=2: return True
-               
-        return False
 
     def getNextIndex(self, currX, currY, currDirection):
         '''
@@ -243,6 +203,9 @@ class UlamSpiral:
         self.grid[center,center] = self.n
         self.increment()
 
+
+        #set first 3 elements beginning with center of grid
+
         #0 = down right
         if self.spin==0:
             self.grid[center+1,center] = self.n
@@ -340,16 +303,51 @@ class UlamSpiral:
             lastDirection=0
 
         #after first 3 elements are set -> set rest until grid is filled
-        while(not self.gridIsFilled()):
+        for currentIteration in range(0,self.size*self.size-3,1):
             lastDirection = self.getNextDirection(lastX,lastY,lastDirection)
-            p = self.getNextIndex(lastX,lastY,lastDirection)
+            lastX,lastY = self.getNextIndex(lastX,lastY,lastDirection)
 
-            lastX=p[0]
-            lastY=p[1]
-
-            self.grid[p]=self.n
+            self.grid[lastX,lastY]=self.n
             self.increment()
 
+            #print out status for biiiiiiiiiig matrices
+            self.printState(currentIteration)        
+
         print(self.grid)
+
+    def printState(self,currentIteration):
+        if currentIteration==int((self.size*self.size)/10):
+            print(" 90%")
+        if currentIteration==int((self.size*self.size)/20):
+            print(" 80%")
+        if currentIteration==int((self.size*self.size)/30):
+            print(" 70%")
+        if currentIteration==int((self.size*self.size)/40):
+            print(" 60%")
+        if currentIteration==int((self.size*self.size)/50):
+            print(" 50%")
+        if currentIteration==int((self.size*self.size)/60):
+            print(" 40%")
+        if currentIteration==int((self.size*self.size)/70):
+            print(" 30%")
+        if currentIteration==int((self.size*self.size)/80):
+            print(" 20%")
+        if currentIteration==int((self.size*self.size)/90):
+            print(" 10%")
+        if currentIteration==self.size*self.size-4:
+            print(" 100%")
+
+    def paint(self):
+        paintMap = numpy.full((self.size,self.size), 255)
+        for row in range(self.size):
+            for col in range(self.size):
+                if self.isPrime(self.grid[row,col]):
+                    #primes=black
+                    paintMap[row,col]=0
+        suffix="_"+str(self.size)+"_"+str(self.spin)+"_"+str(self.start)+"_"+str(self.incrementNumber)
+        f = open(FILENAME+suffix+str(".png"), 'wb')      # binary mode is important
+        w = png.Writer(self.size, self.size, greyscale=True)
+        w.write(f, paintMap)
+        f.close()
 
      
